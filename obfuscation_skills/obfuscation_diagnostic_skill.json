@@ -1,0 +1,138 @@
+{
+  "name": "混淆问题诊断",
+  "description": "根据运行时错误诊断混淆配置问题，提供解决方案和修复步骤。",
+  "version": "1.0.0",
+  "category": "代码混淆",
+  "tags": ["obfuscation", "问题诊断", "错误排查", "故障修复"],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "errorMessage": {
+        "type": "string",
+        "description": "错误信息或异常现象描述"
+      },
+      "errorLog": {
+        "type": "string",
+        "description": "完整的错误日志（可选）"
+      },
+      "configFile": {
+        "type": "string",
+        "description": "当前混淆配置文件路径",
+        "default": "obfuscation-rules.txt"
+      },
+      "projectPath": {
+        "type": "string",
+        "description": "项目根目录路径",
+        "default": "./"
+      },
+      "stackTrace": {
+        "type": "string",
+        "description": "堆栈跟踪信息（可选）"
+      }
+    },
+    "required": ["errorMessage"]
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "错误分类",
+      "description": "根据错误信息识别错误类型，判断是否为混淆相关问题",
+      "actions": [
+        "分析错误信息，识别错误类型",
+        "判断是否为混淆配置问题",
+        "分类：外部 API、字段、HTTP、序列化、日志等未保留"
+      ],
+      "error_patterns": {
+        "external_api": [
+          "Cannot find name",
+          "is not defined",
+          "找不到名称"
+        ],
+        "property_access": [
+          "Cannot read property",
+          "undefined",
+          "无法读取属性"
+        ],
+        "http_request": [
+          "400 Bad Request",
+          "422 Unprocessable Entity",
+          "参数错误"
+        ],
+        "json_parse": [
+          "JSON.parse",
+          "序列化失败",
+          "反序列化"
+        ],
+        "log_field": [
+          "日志字段混淆",
+          "log field obfuscated"
+        ]
+      }
+    },
+    {
+      "step": 2,
+      "name": "定位问题",
+      "description": "从错误信息中提取被混淆的名称，搜索代码库找到原始名称，检查配置文件",
+      "actions": [
+        "提取被混淆的名称",
+        "搜索代码库找到原始名称",
+        "检查配置文件是否包含该名称",
+        "确定问题位置"
+      ]
+    },
+    {
+      "step": 3,
+      "name": "生成解决方案",
+      "description": "提供具体的配置修改建议、修复步骤和验证方法",
+      "actions": [
+        "提供配置修改建议",
+        "说明需要添加的配置项",
+        "提供修复示例和验证步骤"
+      ]
+    },
+    {
+      "step": 4,
+      "name": "生成诊断报告",
+      "description": "生成完整的诊断报告，包括问题分析、解决方案和修复步骤",
+      "actions": [
+        "汇总问题分析和解决方案",
+        "提供修复步骤和验证方法"
+      ]
+    }
+  ],
+  "output_format": {
+    "type": "markdown",
+    "sections": [
+      "## 🔍 问题分析",
+      "## ✅ 解决方案",
+      "## 🔧 修复步骤",
+      "## ✅ 验证方法"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "errorMessage": "Cannot read property 'userId' of undefined",
+        "configFile": "obfuscation-rules.txt",
+        "projectPath": "./kapm_demo"
+      },
+      "description": "诊断 JSON 序列化字段未保留问题"
+    },
+    {
+      "input": {
+        "errorMessage": "Cannot find name 'MySDK'",
+        "configFile": "obfuscation-rules.txt"
+      },
+      "description": "诊断外部 API 未保留问题"
+    },
+    {
+      "input": {
+        "errorMessage": "400 Bad Request: missing required parameter 'name'",
+        "errorLog": "Request body: { a: 'file.zip', b: 'abc123' }",
+        "configFile": "obfuscation-rules.txt"
+      },
+      "description": "诊断 HTTP 请求字段未保留问题"
+    }
+  ]
+}
+

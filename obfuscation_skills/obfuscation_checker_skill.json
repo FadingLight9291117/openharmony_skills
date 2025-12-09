@@ -1,0 +1,99 @@
+{
+  "name": "混淆配置检查器",
+  "description": "检查并验证 OpenHarmony 项目的混淆配置完整性和正确性。通过代码扫描与配置对比，识别缺失、冗余和格式问题，生成详细报告。",
+  "version": "1.0.0",
+  "category": "代码混淆",
+  "tags": ["obfuscation", "配置检查", "配置验证", "代码分析"],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "projectPath": {
+        "type": "string",
+        "description": "项目根目录路径",
+        "default": "./"
+      },
+      "indexFile": {
+        "type": "string",
+        "description": "主入口文件路径",
+        "default": "src/index.ts"
+      },
+      "configFile": {
+        "type": "string",
+        "description": "混淆配置文件路径",
+        "default": "obfuscation-rules.txt"
+      },
+      "strictMode": {
+        "type": "boolean",
+        "description": "严格模式：检查冗余配置项",
+        "default": false
+      }
+    },
+    "required": ["projectPath", "configFile"]
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "解析配置",
+      "description": "读取并解析混淆配置文件",
+      "actions": [
+        "读取混淆配置文件",
+        "解析 -keep-global-name 和 -keep 文件列表",
+        "验证配置格式"
+      ]
+    },
+    {
+      "step": 2,
+      "name": "代码扫描",
+      "description": "扫描项目代码，识别需要保留的内容",
+      "actions": [
+        "扫描外部 API（主入口文件 export）",
+        "扫描数据序列化类型（JSON.stringify/parse）",
+        "扫描对象字面量字段（HTTP 请求、序列化）",
+        "扫描日志字段（logger.info/warn/error）"
+      ]
+    },
+    {
+      "step": 3,
+      "name": "对比分析",
+      "description": "对比代码扫描结果与配置文件",
+      "actions": [
+        "识别缺失配置项",
+        "识别冗余配置项（严格模式）",
+        "检查配置格式问题",
+        "计算配置覆盖率"
+      ]
+    },
+    {
+      "step": 4,
+      "name": "生成报告",
+      "description": "生成检查报告",
+      "actions": [
+        "生成覆盖率统计",
+        "列出缺失/冗余配置项",
+        "提供修复建议"
+      ]
+    }
+  ],
+  "output_format": {
+    "type": "markdown",
+    "sections": [
+      "## 📊 配置覆盖率",
+      "## ❌ 缺失配置项",
+      "## ⚠️ 冗余配置项",
+      "## 🔍 配置格式问题",
+      "## 📝 修复建议"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "projectPath": "./kapm_demo",
+        "indexFile": "src/index.ts",
+        "configFile": "obfuscation-rules.txt",
+        "strictMode": true
+      },
+      "description": "严格模式检查混淆配置"
+    }
+  ]
+}
+
