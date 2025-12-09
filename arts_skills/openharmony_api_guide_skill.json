@@ -1,0 +1,333 @@
+{
+  "name": "OpenHarmony 平台 API 使用指南",
+  "description": "提供 OpenHarmony 平台 API 的使用指南，包括与 Node.js API 的对比、正确的 API 使用方式、常见错误和最佳实践。帮助开发者正确使用 OpenHarmony 平台提供的 API 替代 Node.js API。",
+  "version": "1.0.0",
+  "category": "平台 API",
+  "tags": [
+    "openharmony",
+    "arkts",
+    "ets",
+    "平台 API",
+    "API 迁移",
+    "最佳实践"
+  ],
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "查询内容（如：如何使用文件系统 API、如何进行网络请求、如何处理路径等）"
+      },
+      "codeSnippet": {
+        "type": "string",
+        "description": "代码片段（可选，用于代码审查或迁移建议）"
+      },
+      "apiCategory": {
+        "type": "string",
+        "enum": [
+          "filesystem",
+          "network",
+          "path",
+          "buffer",
+          "logging",
+          "ability",
+          "ui",
+          "crypto",
+          "storage"
+        ],
+        "description": "API 类别（可选，用于聚焦特定领域）"
+      }
+    },
+    "required": [
+      "query"
+    ]
+  },
+  "steps": [
+    {
+      "step": 1,
+      "name": "理解查询意图",
+      "description": "分析用户查询，确定需要提供的 API 指导类型",
+      "actions": [
+        "分析查询内容",
+        "识别 API 类别（文件系统、网络、路径等）",
+        "确定是否需要从 Node.js API 迁移",
+        "确定是否需要代码审查"
+      ]
+    },
+    {
+      "step": 2,
+      "name": "提供 API 映射和对比",
+      "description": "根据查询提供 OpenHarmony API 与 Node.js API 的映射关系",
+      "topics": {
+        "filesystem": [
+          "使用 @kit.CoreFileKit 的 fileIo 接口替代 Node.js fs",
+          "文件读写操作（readText, writeText, open, read, write）",
+          "readText 和 writeText 默认使用 utf-8 编码，无需显式指定 encoding",
+          "目录操作（mkdir, rmdir, listFile）",
+          "文件信息（stat, access）",
+          "异步操作使用 Promise"
+        ],
+        "network": [
+          "使用 @kit.NetworkKit 的 http 接口替代 Node.js http/https",
+          "HTTP 请求：使用 http.createHttp() 创建请求对象，然后调用 request() 方法",
+          "请求方法：使用 http.RequestMethod.GET, http.RequestMethod.POST 等",
+          "请求选项：使用 http.HttpRequestOptions 配置请求（method, header, extraData, readTimeout, connectTimeout）",
+          "网络状态检测：使用 @kit.NetworkKit 的 connection 接口",
+          "错误处理：使用 @kit.BasicServicesKit 的 BusinessError 类型"
+        ],
+        "path": [
+          "OpenHarmony 不提供标准路径处理模块",
+          "需要手动实现路径操作方法",
+          "实现 join, basename, parent 等方法",
+          "使用字符串操作处理路径",
+          "考虑创建自定义 FileSystem 接口封装路径操作"
+        ],
+        "buffer": [
+          "使用 Uint8Array 或 ArrayBuffer 替代 Node.js Buffer",
+          "使用 @kit.ArkTS 的 buffer 工具进行字节数组操作",
+          "使用 @kit.ArkTS 的 util 工具（TextEncoder, TextDecoder 等）",
+          "编码转换（使用 TextEncoder.encodeInto() 和 TextDecoder.decode()，默认 utf-8，无需显式指定 encoding）",
+          "JSON 处理：使用 @kit.ArkTS 的 JSON 接口替代全局 JSON（如果需要特定功能）",
+          "集合类型：使用 @kit.ArkTS 的 ArrayList 等集合类"
+        ],
+        "logging": [
+          "推荐使用 console（console.log, console.info, console.warn, console.error, console.debug）",
+          "console 用法与 Node.js 相同，无需额外导入",
+          "高级场景可使用 @kit.PerformanceAnalysisKit 的 hilog（用于性能分析和系统日志）",
+          "hilog 需要设置日志域（DOMAIN）和标签（TAG）",
+          "hilog 支持格式化字符串（%{public}s, %{public}d）",
+          "应用事件上报使用 hiAppEvent"
+        ],
+        "ability": [
+          "使用 @kit.AbilityKit 的 UIAbility",
+          "生命周期方法（onCreate, onDestroy, onWindowStageCreate）",
+          "上下文（context）使用",
+          "Want 和 LaunchParam"
+        ],
+        "ui": [
+          "使用 @kit.ArkUI 的 window 接口进行窗口管理",
+          "窗口管理（WindowStage, loadContent）",
+          "显示信息：使用 @kit.ArkUI 的 display 接口获取屏幕信息",
+          "UI 组件使用：声明式 UI 开发"
+        ],
+        "crypto": [
+          "使用 @kit.CryptoArchitectureKit 的 cryptoFramework 接口替代 Node.js crypto",
+          "对称加密：使用 cryptoFramework.createCipher() 和 createSymKeyGenerator()",
+          "密钥生成：使用 SymKeyGenerator 生成或转换密钥",
+          "加密算法：支持 AES256|CBC|PKCS5 等标准算法",
+          "数据格式：使用 DataBlob 和 IvParamsSpec 等类型",
+          "配合 @kit.ArkTS 的 buffer 和 util 进行数据转换"
+        ],
+        "storage": [
+          "使用 @kit.ArkData 的 preferences 接口进行键值对存储",
+          "数据持久化：支持同步和异步操作",
+          "设备信息：使用 @kit.BasicServicesKit 的 deviceInfo 获取设备相关信息"
+        ]
+      }
+    },
+    {
+      "step": 3,
+      "name": "提供代码示例",
+      "description": "提供正确的 OpenHarmony API 使用示例",
+      "actions": [
+        "提供 OpenHarmony API 正确使用示例",
+        "提供 Node.js API 错误示例对比",
+        "说明 API 差异和注意事项",
+        "提供迁移步骤"
+      ]
+    },
+    {
+      "step": 4,
+      "name": "代码审查（如提供代码）",
+      "description": "如果提供了代码片段，进行 API 使用审查",
+      "actions": [
+        "检查是否使用了 Node.js API（需要替换）",
+        "检查 OpenHarmony API 使用是否正确",
+        "检查错误处理是否完善",
+        "提供优化建议"
+      ]
+    },
+    {
+      "step": 5,
+      "name": "生成指导报告",
+      "description": "生成完整的 API 使用指导报告",
+      "actions": [
+        "汇总 API 映射关系",
+        "提供代码示例",
+        "提供常见错误和解决方案",
+        "提供官方文档链接"
+      ]
+    }
+  ],
+  "api_mapping": {
+    "filesystem": {
+      "nodejs": "import fs from 'fs'",
+      "openharmony": "import { fileIo } from '@kit.CoreFileKit'",
+      "examples": {
+        "readFile": {
+          "nodejs": "const data = fs.readFileSync('file.txt', 'utf8')",
+          "openharmony": "const data = await fileIo.readText('file.txt') // 默认 utf-8，无需指定 encoding"
+        },
+        "writeFile": {
+          "nodejs": "fs.writeFileSync('file.txt', 'content', 'utf8')",
+          "openharmony": "await fileIo.writeText('file.txt', 'content') // 默认 utf-8，无需指定 encoding"
+        },
+        "mkdir": {
+          "nodejs": "fs.mkdirSync('dir', { recursive: true })",
+          "openharmony": "await fileIo.mkdir('dir', true)"
+        }
+      }
+    },
+    "network": {
+      "nodejs": "import http from 'http'",
+      "openharmony": "import { http } from '@kit.NetworkKit'",
+      "examples": {
+        "get": {
+          "nodejs": "http.get(url, (res) => { ... })",
+          "openharmony": "const httpRequest = http.createHttp();\nconst response = await httpRequest.request(url, {\n  method: http.RequestMethod.GET,\n  header: { 'Content-Type': 'application/json' },\n  readTimeout: 5000,\n  connectTimeout: 5000\n})"
+        },
+        "post": {
+          "nodejs": "http.post(url, { data: 'body' }, (res) => { ... })",
+          "openharmony": "const httpRequest = http.createHttp();\nconst response = await httpRequest.request(url, {\n  method: http.RequestMethod.POST,\n  header: { 'Content-Type': 'application/json' },\n  extraData: JSON.stringify({ data: 'body' }),\n  readTimeout: 5000,\n  connectTimeout: 5000\n})"
+        },
+        "error_handling": {
+          "nodejs": "try { ... } catch (err) { ... }",
+          "openharmony": "import { BusinessError } from '@kit.BasicServicesKit';\ntry {\n  const response = await httpRequest.request(...);\n} catch (err) {\n  const businessError = err as BusinessError;\n  console.error('Request failed:', businessError.message);\n}"
+        }
+      }
+    },
+    "path": {
+      "nodejs": "import path from 'path'",
+      "openharmony": "需要手动实现或使用自定义接口",
+      "examples": {
+        "join": {
+          "nodejs": "path.join('dir', 'file.txt')",
+          "openharmony": "// 手动实现：\nfunction join(...segments: string[]): string {\n  return segments.filter(s => s).join('/').replace(/\\/+/g, '/')\n}"
+        },
+        "basename": {
+          "nodejs": "path.basename('/dir/file.txt')",
+          "openharmony": "// 手动实现：\nfunction basename(filePath: string): string {\n  const parts = filePath.split('/');\n  return parts[parts.length - 1];\n}"
+        }
+      }
+    },
+    "buffer": {
+      "nodejs": "import { Buffer } from 'buffer'",
+      "openharmony": "使用 Uint8Array 或 ArrayBuffer，或 import { buffer } from '@kit.ArkTS'",
+      "examples": {
+        "create": {
+          "nodejs": "const buf = Buffer.from('hello', 'utf8')",
+          "openharmony": "const encoder = new TextEncoder();\nconst buf = encoder.encodeInto('hello') // 使用 encodeInto 方法"
+        },
+        "toString": {
+          "nodejs": "buf.toString('utf8')",
+          "openharmony": "const decoder = new TextDecoder(); // 默认 utf-8\nconst str = decoder.decode(buf)"
+        }
+      }
+    },
+    "logging": {
+      "nodejs": "console.log('message')",
+      "openharmony": "console.log('message') // 推荐：用法与 Node.js 相同",
+      "examples": {
+        "info": {
+          "nodejs": "console.info('message')",
+          "openharmony": "console.info('message') // 推荐方式"
+        },
+        "error": {
+          "nodejs": "console.error('error')",
+          "openharmony": "console.error('error') // 推荐方式"
+        },
+        "hilog_advanced": {
+          "description": "高级场景：性能分析和系统日志",
+          "nodejs": "console.log('message')",
+          "openharmony": "import { hilog } from '@kit.PerformanceAnalysisKit';\nconst DOMAIN = 0x0000;\nhilog.info(DOMAIN, 'TAG', '%{public}s', 'message')"
+        }
+      }
+    },
+    "crypto": {
+      "nodejs": "import crypto from 'crypto'",
+      "openharmony": "import { cryptoFramework } from '@kit.CryptoArchitectureKit'",
+      "examples": {
+        "encrypt": {
+          "nodejs": "const cipher = crypto.createCipheriv('aes-256-cbc', key, iv)",
+          "openharmony": "const symKeyGenerator = cryptoFramework.createSymKeyGenerator('AES256');\nconst symKey = await symKeyGenerator.convertKey({ data: keyBlob });\nconst cipher = cryptoFramework.createCipher('AES256|CBC|PKCS5');\nawait cipher.init(cryptoFramework.CryptoMode.ENCRYPT_MODE, symKey, {\n  iv: { data: ivBlob },\n  algName: 'IvParamsSpec'\n})"
+        },
+        "key_generation": {
+          "nodejs": "const key = crypto.randomBytes(32)",
+          "openharmony": "const symKeyGenerator = cryptoFramework.createSymKeyGenerator('AES256');\nconst symKey = await symKeyGenerator.generateSymKey()"
+        }
+      }
+    }
+  },
+  "common_errors": {
+    "nodejs_api_usage": {
+      "error": "直接使用 Node.js API（如 fs, http, path, Buffer）",
+      "solution": "使用对应的 OpenHarmony API 替代",
+      "example": "❌ import fs from 'fs'\n✅ import { fileIo } from '@kit.CoreFileKit'"
+    },
+    "sync_api_usage": {
+      "error": "使用同步 API（OpenHarmony 主要提供异步 API）",
+      "solution": "使用 async/await 处理异步操作",
+      "example": "❌ const data = fileIo.readTextSync(...)\n✅ const data = await fileIo.readText(...)"
+    },
+    "path_module_missing": {
+      "error": "尝试使用 path 模块（OpenHarmony 不提供）",
+      "solution": "手动实现路径操作方法或使用自定义 FileSystem 接口",
+      "example": "❌ import path from 'path'\n✅ 实现自定义 join/basename/parent 方法"
+    },
+    "buffer_usage": {
+      "error": "使用 Node.js Buffer",
+      "solution": "使用 Uint8Array 或 ArrayBuffer，配合 TextEncoder/TextDecoder",
+      "example": "❌ const buf = Buffer.from('text')\n✅ const buf = new TextEncoder().encodeInto('text')"
+    }
+  },
+  "best_practices": {
+    "error_handling": "使用 try-catch 处理异步 API 错误，注意 BusinessError 类型",
+    "async_operations": "所有文件系统和网络操作都是异步的，使用 async/await",
+    "path_handling": "创建统一的 FileSystem 接口封装路径操作，避免重复实现",
+    "logging": "推荐使用 console（用法与 Node.js 相同），高级场景可使用 hilog 进行性能分析",
+    "type_safety": "使用具体的 OpenHarmony 类型，避免使用 any 或 ESObject",
+    "resource_cleanup": "及时关闭文件句柄和 HTTP 连接，使用 try-finally 确保资源释放"
+  },
+  "output_format": {
+    "type": "markdown",
+    "sections": [
+      "## 📚 API 映射",
+      "## ✅ 正确示例（OpenHarmony）",
+      "## ❌ 错误示例（Node.js）",
+      "## 🔄 迁移步骤",
+      "## ⚠️ 常见错误",
+      "## 💡 最佳实践",
+      "## 📖 官方文档链接"
+    ]
+  },
+  "examples": [
+    {
+      "input": {
+        "query": "如何在 OpenHarmony 中读取文件？",
+        "apiCategory": "filesystem"
+      },
+      "description": "查询文件读取 API 使用"
+    },
+    {
+      "input": {
+        "query": "如何发送 HTTP 请求？",
+        "apiCategory": "network"
+      },
+      "description": "查询网络请求 API 使用"
+    },
+    {
+      "input": {
+        "codeSnippet": "import fs from 'fs';\nconst data = fs.readFileSync('file.txt', 'utf8');",
+        "query": "这段代码如何迁移到 OpenHarmony？"
+      },
+      "description": "代码迁移示例"
+    },
+    {
+      "input": {
+        "query": "如何处理文件路径？",
+        "apiCategory": "path"
+      },
+      "description": "查询路径处理方式"
+    }
+  ]
+}
