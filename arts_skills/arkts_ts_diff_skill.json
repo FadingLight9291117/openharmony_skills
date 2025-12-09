@@ -61,6 +61,7 @@
           "方法定义",
           "属性定义",
           "访问修饰符（private, public, protected）",
+          "构造函数中不能声明字段（需在类中声明，构造函数中赋值）",
           "对象展开和解构（不支持）",
           "数组解构（部分支持）",
           "参数解构（不支持）",
@@ -145,7 +146,8 @@
       "computed_property": "不支持计算属性名 {[key]: value}，需使用字面量值",
       "index_signature": "不支持索引签名 [k: string]: any，需改为 Record<string, ESObject> 或最好显式字段",
       "for_in": "推荐使用 for...of Object.keys(obj) 而不是 for...in",
-      "export_wildcard": "推荐使用具名导出 export { Name } from './module' 而不是 export * from './module'"
+      "export_wildcard": "推荐使用具名导出 export { Name } from './module' 而不是 export * from './module'",
+      "constructor_field_declaration": "不支持在构造函数参数中声明字段，需在类中声明字段，然后在构造函数中赋值。例如：❌ constructor(message: string, public readonly timeout: number) { ... } ✅ class TimeoutError { public readonly timeout: number; constructor(message: string, timeout: number) { this.timeout = timeout; } }"
     },
     "types": {
       "return_this": "方法返回值不能使用 this，必须使用具体的类名",
@@ -163,7 +165,10 @@
     "error_handling": {
       "catch_syntax": "catch (err) 而不是 catch (err: Error)",
       "error_type": "统一使用 Error 类型",
-      "error_propagation": "错误通过 throw 和 catch 传播"
+      "error_propagation": "错误通过 throw 和 catch 传播",
+      "rethrow_error": "catch 到的 error 一定是 Error 类型的子类型，如果再次抛出需要显式转换：throw error as Error，例如：❌ catch (error) { throw error; } ✅ catch (error) { throw error as Error; }",
+      "error_log_message": "catch 到的 error 可以直接使用 .message 属性，不需要类型检查。例如：❌ e instanceof Error ? e.message : String(e) ✅ e.message",
+      "promise_catch_type": "Promise 的 .catch() 中捕获的 error 也需要显式指定类型，如果不清楚类型就用 Error。例如：❌ .catch((error) => { ... }) ✅ .catch((error: Error) => { ... })"
     },
     "best_practices": {
       "comments": "完整保留所有注释（JSDoc、单行、多行、内联）",
